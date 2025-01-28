@@ -302,17 +302,17 @@ class Prescription {
 
   const newPatient = new Patient(
     7370382293,
-    "JBX",
+    "FASTPHARMACY",
     {
       address: {
-        nameOrNumber: "46",
-        street: "St. Brannocks Road",
-        town: "Ilfracombe",
-        city: "Devon",
-        postCode: "EX34 8NF",
+        nameOrNumber: "Fast Pharmacy",
+        street: "Fast Avenue",
+        town: "Fast Town",
+        city: "Fast Countuy",
+        postCode: "FAST FST",
         country: "UK",
       },
-      phone: "079991116665",
+      phone: "07396485930",
       email: "hello@fastpharmacy.net",
       website: ["fastpharmacy.net"],
     },
@@ -326,14 +326,14 @@ class Prescription {
     },
     {
       acuteMedicines: ["Co-Amoxiclav"],
-      repeatMedicines: ["Gabapentin", "Elvanse", "Paracetamol", "Ibuprofen", "Omeprazole"],
+      repeatMedicines: ["Paracetamol", "Ibuprofen", "Omeprazole"],
       discontinuedMedicines: [],
     },
     {
       acuteMedicines: ["Co-Amoxiclav"],
-      repeatMedicines: ["Gabapentin", "Elvanse", "Paracetamol", "Ibuprofen", "Omeprazole"],
+      repeatMedicines: ["Paracetamol", "Ibuprofen", "Omeprazole"],
     },
-    "Barton"
+    "Fast Pharmacy"
   );
   
 console.log(newPatient);
