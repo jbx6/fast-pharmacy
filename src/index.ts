@@ -142,7 +142,7 @@ interface Allergies {
     GSL = "General Sales League"
   }
   
-  interface Medicine {
+  interface MedicineInterface {
     id: number,
     name: string,
     description: string,
@@ -151,10 +151,60 @@ interface Allergies {
     inStock: boolean,
     manufactureDate: Date,
     expiryDate: Date,
-    hasExpired: boolean,
     classification: MedicineClassification
   }
   
+  class Medicine implements MedicineInterface {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    quantityHeldInInventory: number;
+    inStock: boolean;
+    manufactureDate: Date;
+    expiryDate: Date;
+    classification: MedicineClassification;
+
+    constructor(medicine: MedicineInterface) {
+      this.id = medicine.id;
+      this.name = medicine.name;
+      this.description = medicine.description;
+      this.price = medicine.price;
+      this.quantityHeldInInventory = medicine.quantityHeldInInventory;
+      this.inStock = medicine.inStock;
+      this.manufactureDate = medicine.manufactureDate;
+      this.expiryDate = medicine.expiryDate;
+      this.classification = medicine.classification;
+    }
+
+    // Method to check if medicine is in stock
+    isMedicineInStock(): boolean | string | void {
+      const currentQuantityHeldInInventory: number = this.quantityHeldInInventory;
+      const outOfStock: number = 0;
+
+      const stockCheck: boolean = currentQuantityHeldInInventory > outOfStock;
+
+      if (!stockCheck) {
+        console.log(`Medicine "${this.name}" is out of stock.\n ¬ Number held in stock: ${this.quantityHeldInInventory}.\n ¬ Reorder recommended!`);
+        this.inStock = stockCheck;
+        console.log(`inStock: ${this.inStock}.`)
+        return;
+        // return `Medicine ${this.name} Out of Stock`;
+      }
+      
+      console.log(`Medicine ${this.name} is in stock.\n ¬ Number held in stock: ${this.quantityHeldInInventory}.`);
+      // return `Medicine ${this.name} is in stock. Stock count: ${this.quantityHeldInInventory}`;
+
+      // return currentQuantityHeldInInventory > outOfStock;
+    }
+
+    // Method to check if medicine has expired
+    hasExpired(): boolean {
+      const today = new Date();
+
+      return today > this.expiryDate;
+    }
+  }
   // Inventory:
   /**
    * 1. ItemID
@@ -184,7 +234,23 @@ interface Allergies {
     updateMedicine(id: number, updatedMedicine: Partial<Medicine>): void {
         const existingMedicine = this.medicines.get(id);
         if (!existingMedicine) throw new Error("Medicine not found.");
-        const newMedicine = { ...existingMedicine, ...updatedMedicine };
+
+        // const newMedicine = { ...existingMedicine, ...updatedMedicine };
+
+        // Fix for the above issue caused by spread operator when merging objects
+        // When merging objects with spread, the methods defined in a class are NOT 'carried over' because...
+        // ...the spread operator only copies DATA PROPERTIES, not methods from the prototype
+        const newMedicine = new Medicine({
+          id: existingMedicine.id,
+          name: updatedMedicine.name ?? existingMedicine.name,
+          description: updatedMedicine.description ?? existingMedicine.description,
+          price: updatedMedicine.price ?? existingMedicine.price,
+          quantityHeldInInventory: updatedMedicine.quantityHeldInInventory ?? existingMedicine.quantityHeldInInventory,
+          inStock: updatedMedicine.inStock ?? existingMedicine.inStock,
+          manufactureDate: updatedMedicine.manufactureDate ?? existingMedicine.manufactureDate,
+          expiryDate: updatedMedicine.expiryDate ?? existingMedicine.expiryDate,
+          classification: updatedMedicine.classification ?? existingMedicine.classification
+        })
         
         this.medicines.set(id, newMedicine);
     }
@@ -195,6 +261,47 @@ interface Allergies {
 
     deleteMedicine(id: number): void {
         this.medicines.delete(id);
+    }
+
+    getMedicinesInStock(): Medicine[] | string | void {
+      const medicinesArray = Array.from(this.medicines.values());
+      const inStockMedicines = medicinesArray.filter(medicine => medicine.quantityHeldInInventory > 0);
+      const outOfStockMedicines = medicinesArray.filter(medicine => medicine.quantityHeldInInventory < 1);
+      const lowStockMedicines = medicinesArray.filter(medicine => medicine.quantityHeldInInventory >= 1 && medicine.quantityHeldInInventory <= 10);
+
+      // const isStockLow: boolean = lowStockMedicines.filter(medicine => medicine.quantityHeldInInventory)
+
+      if (inStockMedicines.length === 0) {
+        const outOfStockStatement: string = "No medicines in stock.";
+
+        const outOfStockMedicinesFormattedOutputMap = outOfStockMedicines.map((medicine, index) => `${index + 1}. ${medicine.name}: ${medicine.quantityHeldInInventory}`).join("\n");
+        const outOfStockMedicinesStatement: string = `Medicines out of stock:\n${outOfStockMedicinesFormattedOutputMap}`;
+        console.log(outOfStockStatement); // 'return' void (no return)
+        console.log(outOfStockMedicinesStatement);
+
+        return //outOfStockStatement (as a string)
+
+      } 
+      
+      if (lowStockMedicines.length > 0) {
+        const lowStockStatement: string = "ATTENTION: Some medicine stocks are low. Consider reordering.";
+        const lowStockMedicinesFormattedOutputMap = lowStockMedicines.map((medicine, index) => `${index + 1}. ${medicine.name}: ${medicine.quantityHeldInInventory}`).join("\n");
+        const lowStockMedicinesStatement: string = `Low-stock medicines:\n${lowStockMedicinesFormattedOutputMap}`;
+
+        console.log(lowStockStatement);
+        console.log(lowStockMedicinesStatement);
+
+        // return; // if i return here, this will skip displaying any medicines with a stock count > 10, thereby only returning the medicines with a low stock (between 1 and 10)
+
+        // return lowStockMedicinesStatement;
+      }
+
+      const formattedOutput = inStockMedicines.map((medicine, index) => `${index + 1}. ${medicine.name}: ${medicine.quantityHeldInInventory}`).join("\n");
+      const stockStatement: string = `Medicines in stock:\n${formattedOutput}`;
+      
+      console.log(stockStatement);
+      // return inStockStamenent (return as a string);
+      // return inStockMedicines.length > 0 ? inStockMedicines : "No medicines in stock.";
     }
   }
   
@@ -242,6 +349,8 @@ class Prescription {
         this.completionDate = prescription.completionDate || null;
     }
 }
+
+
   
   // Pharmacy:
   /**
@@ -300,7 +409,7 @@ class Prescription {
     }
   }
 
-  const newPatient = new Patient(
+const newPatient = new Patient(
     7370382293,
     "FASTPHARMACY",
     {
@@ -336,4 +445,79 @@ class Prescription {
     "Fast Pharmacy"
   );
   
-console.log(newPatient);
+
+const paracetamol = new Medicine({
+  id: 101,
+  name: "Paracetamol",
+  description: "Analgesic",
+  price: 1.99,
+  quantityHeldInInventory: 0,
+  inStock: true,
+  manufactureDate: new Date("2024-01-01"),
+  expiryDate: new Date("2026-01-01"),
+  classification: MedicineClassification.GSL
+});
+
+const ibuprofen = new Medicine({
+  id: 102,
+  name: "Ibuprofen",
+  description: "Anti-inflammatory",
+  price: 0.99,
+  quantityHeldInInventory: 0,
+  inStock: true,
+  manufactureDate: new Date("2024-01-01"),
+  expiryDate: new Date("2026-01-01"),
+  classification: MedicineClassification.GSL
+});
+
+const gabapentin = new Medicine({
+  id: 103,
+  name: "Gabapentin",
+  description: "Gabapentinoid",
+  price: 6.99,
+  quantityHeldInInventory: 0,
+  inStock: true,
+  manufactureDate: new Date("2024-01-01"),
+  expiryDate: new Date("2026-01-01"),
+  classification: MedicineClassification.POM
+});
+
+const elvanse = new Medicine({
+  id: 104,
+  name: "Elvanse",
+  description: "ADHD Pills",
+  price: 10.99,
+  quantityHeldInInventory: 1,
+  inStock: true,
+  manufactureDate: new Date("2024-01-01"),
+  expiryDate: new Date("2026-01-01"),
+  classification: MedicineClassification.CD
+});
+
+const newPrescription = new Prescription({
+  id: 1,
+  patient: newPatient,
+  medicine: paracetamol,
+  patientID: newPatient.id,
+  medicineID: paracetamol.id,
+  prescriptionStartDate: new Date("2025-01-23"),
+  prescriptionReviewDate: new Date("2025-07-23"),
+  dispensedDate: new Date("2025-01-27"),
+  collectionDate: new Date("2025-01-28"),
+  completionDate: new Date("2025-01-28")
+});
+
+const inventory = new Inventory();
+
+// console.log(newPatient);
+// console.log(paracetamol);
+// console.log(newPrescription);
+
+// paracetamol.isMedicineInStock();
+
+inventory.addMedicine(paracetamol);
+inventory.addMedicine(ibuprofen);
+inventory.addMedicine(gabapentin);
+inventory.addMedicine(elvanse);
+
+inventory.getMedicinesInStock();
