@@ -3,10 +3,10 @@ import { Medicine } from "./Medicine";
 
 export interface PrescriptionInterface {
     patient: Patient,
-    medicine: Medicine,
+    medicines: Medicine[],
     id: number,
     patientID: Patient["id"],
-    medicineID: Medicine["id"],
+    medicineIDs: Medicine["id"][],
     prescriptionStartDate: Date,
     prescriptionReviewDate: Date,
     dispensedDate: Date,
@@ -17,7 +17,8 @@ export interface PrescriptionInterface {
 export class Prescription {
     id: number;
     patientID: number;
-    medicineID: number;
+    medicines: Medicine[];
+    medicineIDs: number[];
     prescriptionStartDate: Date;
     prescriptionReviewDate: Date;
     dispensedDate: Date | null;
@@ -27,7 +28,8 @@ export class Prescription {
     constructor(prescription: PrescriptionInterface) {
         this.id = prescription.id;
         this.patientID = prescription.patientID;
-        this.medicineID = prescription.medicineID;
+        this.medicines = prescription.medicines;
+        this.medicineIDs = prescription.medicineIDs;
         this.prescriptionStartDate = prescription.prescriptionStartDate;
         this.prescriptionReviewDate = prescription.prescriptionReviewDate;
         this.dispensedDate = prescription.dispensedDate || null;

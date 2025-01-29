@@ -48,4 +48,6 @@ const elvanse = new Medicine({
     classification: MedicineClassification.CD
   });
 
-export { paracetamol, ibuprofen, gabapentin, elvanse };
+const medicines = { paracetamol, ibuprofen, gabapentin, elvanse }
+
+export default medicines;

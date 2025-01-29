@@ -1,6 +1,9 @@
 import { Inventory } from "./Inventory";
-import { paracetamol, ibuprofen, gabapentin, elvanse } from "./medicines";
+import medicines from "./medicines";
 import { Medicine } from "./Medicine";
+import { Prescription } from "./Prescription";
+import { newPatient } from "./patients";
+import { newPrescription } from "./prescriptions";
 
 async function main(pharmacyName: string, medicines: { paracetamol: Medicine, ibuprofen: Medicine, gabapentin: Medicine, elvanse: Medicine }) {
   console.log("Welcome to Fast Pharmacy!");
@@ -15,8 +18,16 @@ async function main(pharmacyName: string, medicines: { paracetamol: Medicine, ib
   inventory.addMedicine(medicines.elvanse);
 
   inventory.getMedicinesInStock();
+
+  // init new patient
+  // init prescription for said patient
+  // init pharmacymanager to perform actions on above, such as dispensing, completion, stock-check errors (if req. medicine !inStock), etc
 }
 
-const medicines = { paracetamol, ibuprofen, gabapentin, elvanse };
-
 main("Fast Pharmacy", medicines);
+
+/** TO-DO
+ * 1. New patients;
+ * 2. New prescriptions;
+ * 3. PharmacyManager so this app can do stuff
+ */

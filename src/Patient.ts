@@ -1,4 +1,5 @@
 import { ContactDetails, Allergies, MedicalHistory, PrescriptionHistory, AuthorisedMedicines } from "./app";
+import { PrescriptionInterface } from "./Prescription";
 
 export interface PatientInterface {
     id: number,
@@ -10,7 +11,8 @@ export interface PatientInterface {
     medicalHistory: MedicalHistory,
     prescriptionHistory: PrescriptionHistory,
     authorisedMedicines: AuthorisedMedicines,
-    nominatedPharmacy: string
+    nominatedPharmacy: string,
+    prescriptions: PrescriptionInterface
   }
 
 export class Patient {
@@ -24,7 +26,6 @@ export class Patient {
     prescriptionHistory: PrescriptionHistory;
     authorisedMedicines: AuthorisedMedicines;
     nominatedPharmacy: string;
-
 
     constructor(
         id: Patient['id'], 
